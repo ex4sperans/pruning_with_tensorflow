@@ -15,6 +15,7 @@ class FullyConnectedClassifier(BaseNetwork):
                  activation_fn=tf.nn.relu,
                  dropout=0.25,
                  momentum=0.9,
+                 weight_decay=0.0005,
                  scope='FullyConnectedNetwork'):
 
         self. input_size = input_size
@@ -23,6 +24,7 @@ class FullyConnectedClassifier(BaseNetwork):
         self.activation_fn = activation_fn
         self.dropout = dropout
         self.momentum = momentum
+        self.weight_decay = weight_decay
         self.scope = scope
 
         self.graph = tf.Graph()
@@ -30,18 +32,27 @@ class FullyConnectedClassifier(BaseNetwork):
             with tf.variable_scope(self.scope):
 
                 self._create_placeholders()
+
                 self.logits = self._build_network(inputs=self.inputs,
                                                   layer_sizes=self.layer_sizes,
                                                   activation_fn=self.activation_fn,
                                                   keep_prob=self.keep_prob)
-                self.loss = self._create_loss(self.logits, self.labels)
+
+                self.loss = self._create_loss(logits=self.logits,
+                                              labels=self.labels,
+                                              weight_decay=self.weight_decay)
+
                 self.train_op = self._create_optimizer(self.loss,
                                                        learning_rate=self.learning_rate,
                                                        momentum=momentum)
+
                 self._create_metrics(logits=self.logits,
                                      labels=self.labels,
                                      loss=self.loss)
+
                 self.init_variables(tf.global_variables())
+
+                tf.losses.get_regularization_losses()
 
 
     def _create_placeholders(self):
@@ -72,26 +83,40 @@ class FullyConnectedClassifier(BaseNetwork):
     
             net = inputs
     
+            weights_initializer = tf.truncated_normal_initializer(stddev=0.01)
+            bias_initializer = tf.constant_initializer(0.1)
+
             for i, layer_size in enumerate(layer_sizes):
     
                 with tf.variable_scope('layer_{layer}'.format(layer=i+1)):
+                    
                     name = 'weights'
                     shape = (tensorflow_utils.get_second_dimension(net), layer_size)
-                    weights = tf.get_variable(name=name, shape=shape)
+                    weights = tf.get_variable(name=name,
+                                              shape=shape,
+                                              initializer=weights_initializer)
+
+                    tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES,
+                                         tf.reduce_sum(weights ** 2))
         
                     name = 'bias'
                     shape = [layer_size]
-                    bias = tf.get_variable(name=name, shape=shape)
+                    bias = tf.get_variable(name=name,
+                                           shape=shape,
+                                           initializer=bias_initializer)
     
                     net = tf.matmul(net, weights) + bias
     
-                    if not i < len(layer_sizes) - 1:
+                    if i < len(layer_sizes) - 1:
                         net = activation_fn(net)
                         net = tf.nn.dropout(net, keep_prob=keep_prob)
     
             return net
     
-    def _create_loss(self, logits: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
+    def _create_loss(self,
+                     logits: tf.Tensor,
+                     labels: tf.Tensor,
+                     weight_decay: float) -> tf.Tensor:
     
         with tf.variable_scope('loss'):
             classification_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
@@ -100,8 +125,10 @@ class FullyConnectedClassifier(BaseNetwork):
     
             classification_loss = tf.reduce_mean(classification_loss,
                                                  name='classification_loss_averaged')
+
+            l2_loss = weight_decay * tf.add_n(tf.losses.get_regularization_losses())
     
-            return classification_loss
+            return l2_loss + classification_loss
 
     def _create_optimizer(self,
                           loss: tf.Tensor,
@@ -151,7 +178,7 @@ class FullyConnectedClassifier(BaseNetwork):
     
             train_accuracy, train_loss = self.evaluate(train_data_provider,
                                                        batch_size=batch_size)
-            validation_accuracy, validation_loss = self.evaluate(train_data_provider,
+            validation_accuracy, validation_loss = self.evaluate(validation_data_provider,
                                                                  batch_size=batch_size)
 
             print('\nEpoch {epoch} completed.'.format(epoch=epoch+1))
