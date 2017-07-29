@@ -4,8 +4,6 @@ import tensorflow as tf
 
 from networks import network_dense
 
-
-
 class TestNetwork(unittest.TestCase):
 
     def setUp(self):
@@ -16,7 +14,8 @@ class TestNetwork(unittest.TestCase):
 
         self.network = network_dense.FullyConnectedClassifier(input_size=input_size,
                                                               n_classes=n_classes,
-                                                              layer_sizes=layer_sizes)
+                                                              layer_sizes=layer_sizes,
+                                                              verbose=False)
 
     def test_logits_shape(self):
 

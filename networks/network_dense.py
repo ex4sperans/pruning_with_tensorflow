@@ -16,7 +16,8 @@ class FullyConnectedClassifier(BaseNetwork):
                  dropout=0.25,
                  momentum=0.9,
                  weight_decay=0.0005,
-                 scope='FullyConnectedNetwork'):
+                 scope='FullyConnectedClassifier',
+                 verbose=True):
 
         self. input_size = input_size
         self.n_classes = n_classes
@@ -26,6 +27,7 @@ class FullyConnectedClassifier(BaseNetwork):
         self.momentum = momentum
         self.weight_decay = weight_decay
         self.scope = scope
+        self.verbose = verbose
 
         self.graph = tf.Graph()
         with self.graph.as_default():
@@ -53,6 +55,12 @@ class FullyConnectedClassifier(BaseNetwork):
                 self.init_variables(tf.global_variables())
 
                 tf.losses.get_regularization_losses()
+
+                if self.verbose:
+                    print('\nSuccessfully created graph for {model}.'.format(
+                                                                model=self.scope))
+                    print('Number of parameters: {number}.\n'.format(
+                    number=int(self.number_of_parameters(tf.trainable_variables()))))
 
 
     def _create_placeholders(self):
@@ -89,7 +97,7 @@ class FullyConnectedClassifier(BaseNetwork):
             for i, layer_size in enumerate(layer_sizes):
     
                 with tf.variable_scope('layer_{layer}'.format(layer=i+1)):
-                    
+
                     name = 'weights'
                     shape = (tensorflow_utils.get_second_dimension(net), layer_size)
                     weights = tf.get_variable(name=name,
@@ -210,7 +218,3 @@ class FullyConnectedClassifier(BaseNetwork):
             average_loss += loss / n_iterations
 
         return average_accuracy, average_loss
-
-    def predict():
-
-        pass
