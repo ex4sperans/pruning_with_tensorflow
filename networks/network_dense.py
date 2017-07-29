@@ -20,7 +20,7 @@ class FullyConnectedClassifier:
 
         self. input_size = input_size
         self.n_classes = n_classes
-        self.layer_sizes = layer_sizes
+        self.layer_sizes = layer_sizes + [n_classes]
         self.activation_fn = activation_fn
         self.dropout = dropout
         self.momentum = momentum
