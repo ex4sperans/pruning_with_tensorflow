@@ -1,3 +1,4 @@
 __pycache__
 env
 *.pyc
+MNIST_data
