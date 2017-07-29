@@ -9,14 +9,14 @@ def get_second_dimension(tensor):
 
 class FullyConnectedClassifier:
 
-    __init__(self,
-             input_size,
-             n_classes,
-             layer_sizes: list,
-             activation_fn=tf.nn.relu,
-             dropout=0.75,
-             momentum=0.9,
-             scope='FullyConnectedNetwork'):
+    def __init__(self,
+                 input_size: int,
+                 n_classes: int,
+                 layer_sizes: list,
+                 activation_fn=tf.nn.relu,
+                 dropout=0.75,
+                 momentum=0.9,
+                 scope='FullyConnectedNetwork'):
 
         self. input_size = input_size
         self.n_classes = n_classes
@@ -30,11 +30,12 @@ class FullyConnectedClassifier:
         with self.graph.as_default():
             with tf.variable_scope(self.scope):
 
+                self._create_placeholders()
                 self.logits = self._build_network(inputs=self.inputs,
                                                   layer_sizes=self.layer_sizes,
                                                   activation_fn=self.activation_fn,
                                                   keep_prob=self.keep_prob)
-                self.loss = self._create_loss(self.logits)
+                self.loss = self._create_loss(self.logits, self.labels)
                 self.train_op = self._create_optimizer(self.loss,
                                                        learning_rate=self.learning_rate,
                                                        momentum=momentum)
@@ -70,27 +71,27 @@ class FullyConnectedClassifier:
     
             for i, layer_size in enumerate(layer_sizes):
     
-                with tf.variable_scope('layer_{layer}'.format(layer=i+1))
-                name = 'weights'
-                shape = (get_second_dimension(net), layer_size)
-                weights = tf.get_variable(name=name, shape=shape)
+                with tf.variable_scope('layer_{layer}'.format(layer=i+1)):
+                    name = 'weights'
+                    shape = (get_second_dimension(net), layer_size)
+                    weights = tf.get_variable(name=name, shape=shape)
+        
+                    name = 'bias'
+                    shape = [layer_size]
+                    bias = tf.get_variable(name=name, shape=shape)
     
-                name = 'bias'
-                shape = [layer_size]
-                bias = tf.get_variable(name=name, shape=shape)
+                    net = tf.matmul(net, weights) + bias
     
-                net = tf.matmul(net, weights) + bias
-    
-                if not i < len(layer_sizes) - 1:
-                    net = activation_fn(net)
-                    net = tf.nn.dropout(x, keep_prob=keep_prob)
+                    if not i < len(layer_sizes) - 1:
+                        net = activation_fn(net)
+                        net = tf.nn.dropout(net, keep_prob=keep_prob)
     
             return net
     
     def _create_loss(self, logits: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
     
         with tf.variable_scope('loss'):
-            classification_loss = tf.sparse_softmax_entropy_with_logits(
+            classification_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
                                             logits=logits, labels=labels,
                                             name='classification_loss')
     
