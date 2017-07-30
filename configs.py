@@ -10,7 +10,7 @@ class ConfigNetworkDense:
     activation_fn = tf.nn.relu
     model_path = 'saved_models/network_dense'
 
-    n_epochs = 2
+    n_epochs = 40
     batch_size = 100
 
     @staticmethod

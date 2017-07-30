@@ -19,7 +19,6 @@ class TestNetworkGraph(unittest.TestCase):
                                                          model_path='temp',
                                                          verbose=False)
 
-
         self.assertEqual(network.logits.get_shape().as_list(), [None, 5])
         self.assertEqual(network.loss.get_shape().as_list(), [])
         self.assertIsInstance(network.train_op, tf.Operation)
