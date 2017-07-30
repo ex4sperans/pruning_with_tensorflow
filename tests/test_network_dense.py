@@ -24,6 +24,11 @@ class TestNetworkGraph(unittest.TestCase):
         self.assertEqual(network.loss.get_shape().as_list(), [])
         self.assertIsInstance(network.train_op, tf.Operation)
 
+        shapes = [[20, 5], [5, 10], [10, 5]]
+        for v, shape in zip(network.weight_matricies, shapes):
+            self.assertEqual(v.get_shape().as_list(), shape)
+
+
 
 class TestNetworkSaveRestore(unittest.TestCase):
 
