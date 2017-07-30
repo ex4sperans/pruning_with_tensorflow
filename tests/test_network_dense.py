@@ -1,32 +1,52 @@
 import unittest
+import shutil
 
 import tensorflow as tf
 
 from networks import network_dense
 
-class TestNetwork(unittest.TestCase):
+class TestNetworkGraph(unittest.TestCase):
 
-    def setUp(self):
+    def test_shapes(self):
 
         input_size = 20
         n_classes = 5
         layer_sizes = [5, 10]
 
-        self.network = network_dense.FullyConnectedClassifier(input_size=input_size,
-                                                              n_classes=n_classes,
-                                                              layer_sizes=layer_sizes,
-                                                              verbose=False)
+        network = network_dense.FullyConnectedClassifier(input_size=input_size,
+                                                         n_classes=n_classes,
+                                                         layer_sizes=layer_sizes,
+                                                         model_path='temp',
+                                                         verbose=False)
 
-    def test_logits_shape(self):
 
-        self.assertEqual(self.network.logits.get_shape().as_list(), [None, 5])
+        self.assertEqual(network.logits.get_shape().as_list(), [None, 5])
+        self.assertEqual(network.loss.get_shape().as_list(), [])
+        self.assertIsInstance(network.train_op, tf.Operation)
 
-    def test_loss_shape(self):
 
-        self.assertEqual(self.network.loss.get_shape().as_list(), [])
+class TestNetworkSaveRestore(unittest.TestCase):
 
-    def test_train_operation(self):
+    def test_save_restore(self):
 
-        self.assertIsInstance(self.network.train_op, tf.Operation)
+        input_size = 20
+        n_classes = 5
+        layer_sizes = [5, 10]
 
+        network = network_dense.FullyConnectedClassifier(input_size=input_size,
+                                                         n_classes=n_classes,
+                                                         layer_sizes=layer_sizes,
+                                                         model_path='temp',
+                                                         verbose=False)
+
+        variables_original = network.sess.run(network.weight_matricies)
+        network.save_model()
+        network.load_model()
+        variables_restored = network.sess.run(network.weight_matricies)
+
+        for original, restored in zip(variables_original, variables_restored):
+            self.assertTrue((original==restored).all())
+
+    def tearDown(self):
+        shutil.rmtree('temp')
 

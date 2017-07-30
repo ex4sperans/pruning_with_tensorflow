@@ -8,8 +8,9 @@ class ConfigNetworkDense:
     dropout = 0.25
     weight_decay = 0.0005
     activation_fn = tf.nn.relu
+    model_path = 'saved_models/network_dense'
 
-    n_epochs = 40
+    n_epochs = 2
     batch_size = 100
 
     @staticmethod

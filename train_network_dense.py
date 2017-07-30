@@ -16,6 +16,7 @@ from configs import ConfigNetworkDense as config
 classifier = network_dense.FullyConnectedClassifier(input_size=config.input_size,
                                                     n_classes=config.n_classes,
                                                     layer_sizes=config.layer_sizes,
+                                                    model_path=config.model_path,
                                                     dropout=config.dropout,
                                                     weight_decay=config.weight_decay,
                                                     activation_fn=config.activation_fn)

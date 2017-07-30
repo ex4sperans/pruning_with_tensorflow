@@ -12,6 +12,7 @@ class FullyConnectedClassifier(BaseNetwork):
                  input_size: int,
                  n_classes: int,
                  layer_sizes: list,
+                 model_path: str,
                  activation_fn=tf.nn.relu,
                  dropout=0.25,
                  momentum=0.9,
@@ -22,6 +23,7 @@ class FullyConnectedClassifier(BaseNetwork):
         self. input_size = input_size
         self.n_classes = n_classes
         self.layer_sizes = layer_sizes + [n_classes]
+        self.model_path = model_path
         self.activation_fn = activation_fn
         self.dropout = dropout
         self.momentum = momentum
@@ -52,6 +54,7 @@ class FullyConnectedClassifier(BaseNetwork):
                                      labels=self.labels,
                                      loss=self.loss)
 
+                self.saver = self._create_saver(tf.global_variables())
                 self.init_variables(tf.global_variables())
 
                 tf.losses.get_regularization_losses()
@@ -91,6 +94,7 @@ class FullyConnectedClassifier(BaseNetwork):
     
             net = inputs
     
+            self.weight_matricies = []
             weights_initializer = tf.truncated_normal_initializer(stddev=0.01)
             bias_initializer = tf.constant_initializer(0.1)
 
@@ -104,6 +108,7 @@ class FullyConnectedClassifier(BaseNetwork):
                                               shape=shape,
                                               initializer=weights_initializer)
 
+                    self.weight_matricies.append(weights)
                     tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES,
                                          tf.reduce_sum(weights ** 2))
         
@@ -148,8 +153,10 @@ class FullyConnectedClassifier(BaseNetwork):
             optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,
                                                    momentum=momentum,
                                                    name='optimizer')
-            global_step = tf.Variable(0)
-            train_op = optimizer.minimize(loss, global_step=global_step, name='train_op')
+            self.global_step = tf.Variable(0)
+            train_op = optimizer.minimize(loss,
+                                          global_step=self.global_step,
+                                          name='train_op')
 
             return train_op
 
@@ -160,6 +167,11 @@ class FullyConnectedClassifier(BaseNetwork):
 
         correct_prediction = tf.equal(tf.argmax(self.logits, 1), labels)
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+    def _create_saver(self, var_list):
+
+        saver = tf.train.Saver(var_list=var_list)
+        return saver
 
     def fit(self,
             n_epochs: int,
@@ -194,6 +206,15 @@ class FullyConnectedClassifier(BaseNetwork):
                                     accuracy=train_accuracy, loss=train_loss))
             print('Accuracy on validation: {accuracy}, loss on validation: {loss}'.format(
                                     accuracy=validation_accuracy, loss=validation_loss))
+
+        test_accuracy, test_loss = self.evaluate(test_data_provider,
+                                                 batch_size=batch_size)
+
+        print('\nOptimization finished.'.format(epoch=epoch+1))
+        print('Accuracy on test: {accuracy}, loss on test: {loss}'.format(
+                                accuracy=test_accuracy, loss=test_loss))
+
+        self.save_model(global_step=self.global_step)
 
     def evaluate(self, data_provider, batch_size: int):
 

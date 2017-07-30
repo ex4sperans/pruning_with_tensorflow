@@ -1,3 +1,5 @@
+import os
+
 import tensorflow as tf
 import numpy as np
 
@@ -17,3 +19,19 @@ class BaseNetwork:
 
     def number_of_parameters(self, var_list):
         return sum(np.prod(v.get_shape().as_list()) for v in var_list)
+
+    def save_model(self, path=None, sess=None, global_step=None, verbose=True):
+        save_dir = path or self.model_path
+        os.makedirs(save_dir, exist_ok=True)
+        self.saver.save(sess or self.sess,
+                        os.path.join(save_dir, 'model.ckpt'),
+                        global_step=global_step)
+
+    def load_model(self, path=None, sess=None, verbose=True):
+        if path is None:
+            ckpt = tf.train.get_checkpoint_state(self.model_path)
+            if ckpt is None:
+                raise FileNotFoundError('Can`t load a model. '\
+                'Checkpoint does not exist.')    
+        restore_path = path or ckpt.model_checkpoint_path
+        self.saver.restore(sess or self.sess, restore_path)
