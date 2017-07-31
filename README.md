@@ -23,7 +23,7 @@ At first, you need to install required python packages.
 I'd highly recommend to use [virtualenv](https://virtualenv.pypa.io/en/stable/) to isolate this project from other python projects.
 However you could install all the packages into a system if you want to.
 
-NOTE: I used python3.5 for this project.
+NOTE: I used ```python3.5``` for this project.
 
 To install the packages, run the following terminal command:
 
@@ -32,7 +32,7 @@ To install the packages, run the following terminal command:
 
 Now you are ready to run the experiments.
 
-Run
+Run 
 
 ```python train_network_dense.py```
 
