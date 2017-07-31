@@ -34,7 +34,7 @@ with classifier.graph.as_default():
                               if w.name[:-2] in v.name
                               and 'optimizer' in v.name]
 
-# load model previously trained model
+# load previously trained model
 # and get values of weights and optimizer variables
 weights, optimizer_weights = (classifier
                              .load_model(config_dense.model_path)

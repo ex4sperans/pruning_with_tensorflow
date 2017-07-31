@@ -84,7 +84,8 @@ class FullyConnectedClassifierSparse(FullyConnectedClassifier):
             for i, layer in enumerate(sparse_layers):
     
                 with tf.variable_scope('layer_{layer}'.format(layer=i+1)):
-                    
+
+                    # create variables based on sparse values                    
                     with tf.variable_scope('sparse'):
 
                         indicies = tf.get_variable(name='indicies',
@@ -99,6 +100,7 @@ class FullyConnectedClassifierSparse(FullyConnectedClassifier):
                                                       initializer=layer.dense_shape,
                                                       dtype=tf.int64)
 
+                    # create a weight tensor based on the created variables
                     weights = tf.sparse_to_dense(tf.cast(indicies, tf.int64),
                                                  dense_shape,
                                                  values)

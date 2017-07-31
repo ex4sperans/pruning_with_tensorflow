@@ -9,6 +9,7 @@ class BaseNetwork:
     def sess(self):
         if not hasattr(self, '_sess'):
             config = tf.ConfigProto()
+            # to save GPU resources
             config.gpu_options.allow_growth = True
             self._sess = tf.Session(config=config, graph=self.graph)
         return self._sess

@@ -1,6 +1,10 @@
 from matplotlib import pyplot as plt
 
-def plot_histogram(weights_list, image_name, include_zeros=True):
+def plot_histogram(weights_list: list,
+                   image_name: str,
+                   include_zeros=True):
+
+    """A function to plot weights distribution"""
 
     weights = []
     for w in weights_list:

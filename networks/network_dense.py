@@ -21,6 +21,8 @@ class FullyConnectedClassifier(BaseNetwork):
                  verbose=True,
                  pruning_threshold=None):
 
+        """Create an instance of FullyConnectedClassifier"""
+
         self.input_size = input_size
         self.n_classes = n_classes
         self.layer_sizes = layer_sizes + [n_classes]
@@ -68,6 +70,8 @@ class FullyConnectedClassifier(BaseNetwork):
 
 
     def _create_placeholders(self):
+
+        # create input nodes of a graph
     
         self.inputs = tf.placeholder(dtype=tf.float32,
                                      shape=(None, self.input_size),
@@ -90,7 +94,7 @@ class FullyConnectedClassifier(BaseNetwork):
                        layer_sizes: list,
                        activation_fn: callable,
                        keep_prob: Union[tf.Tensor, float]) -> tf.Tensor:
-    
+
         with tf.variable_scope('network'):
     
             net = inputs
@@ -100,6 +104,8 @@ class FullyConnectedClassifier(BaseNetwork):
 
             weights_initializer = tf.truncated_normal_initializer(stddev=0.01)
             bias_initializer = tf.constant_initializer(0.1)
+
+            # dynamically create a network
 
             for i, layer_size in enumerate(layer_sizes):
     
@@ -112,6 +118,7 @@ class FullyConnectedClassifier(BaseNetwork):
                                               initializer=weights_initializer)
 
                     self.weight_matrices.append(weights)
+                    # L2 loss
                     tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES,
                                          tf.reduce_sum(weights ** 2))
         
@@ -124,6 +131,7 @@ class FullyConnectedClassifier(BaseNetwork):
     
                     net = tf.matmul(net, weights) + bias
     
+                    # no activation and dropout on the last layer
                     if i < len(layer_sizes) - 1:
                         net = activation_fn(net)
                         net = tf.nn.dropout(net, keep_prob=keep_prob)
@@ -174,13 +182,15 @@ class FullyConnectedClassifier(BaseNetwork):
                               grads_and_vars: list,
                               threshold: float):
 
+        # we need to make gradients correspondent
+        # to the pruned weights to be zero
+
         grads_and_vars_sparse = []
 
         for grad, var in grads_and_vars:
             if 'weights' in var.name:
                 small_weights = tf.greater(threshold, tf.abs(var))
                 mask = tf.cast(tf.logical_not(small_weights), tf.float32)
-                # var = var * mask
                 grad = grad * mask
 
             grads_and_vars_sparse.append((grad, var))
@@ -244,6 +254,7 @@ class FullyConnectedClassifier(BaseNetwork):
 
                 self.sess.run(self.train_op, feed_dict=feed_dict)
     
+            # evaluate metrics after every epoch
             train_accuracy, train_loss = self.evaluate(train_data_provider,
                                                        batch_size=batch_size)
             validation_accuracy, validation_loss = self.evaluate(validation_data_provider,

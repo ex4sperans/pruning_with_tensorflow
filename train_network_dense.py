@@ -13,6 +13,7 @@ test_data_provider = mnist.test
 from networks import network_dense
 from configs import ConfigNetworkDense as config
 
+# create a classifier
 classifier = network_dense.FullyConnectedClassifier(input_size=config.input_size,
                                                     n_classes=config.n_classes,
                                                     layer_sizes=config.layer_sizes,
@@ -21,6 +22,7 @@ classifier = network_dense.FullyConnectedClassifier(input_size=config.input_size
                                                     weight_decay=config.weight_decay,
                                                     activation_fn=config.activation_fn)
 
+# than train it
 classifier.fit(n_epochs=config.n_epochs,
                batch_size=config.batch_size,
                learning_rate_schedule=config.learning_rate_schedule,
