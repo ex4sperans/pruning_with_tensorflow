@@ -49,7 +49,7 @@ class TestNetworkSaveRestore(unittest.TestCase):
         variables_restored = network.sess.run(network.weight_matricies)
 
         for original, restored in zip(variables_original, variables_restored):
-            self.assertTrue((original==restored).all())
+            self.assertTrue((original == restored).all())
 
     def tearDown(self):
         shutil.rmtree('temp')
