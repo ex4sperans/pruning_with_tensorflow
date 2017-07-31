@@ -33,7 +33,7 @@ accuracy, loss = classifier.evaluate(data_provider=test_data_provider,
 print('Accuracy on test with dense model (pruned): {accuracy}, loss on test: {loss}'.format(
                                                    accuracy=accuracy, loss=loss))
 
-weight_matrices, biases = classifier.sess.run([classifier.weight_matricies,
+weight_matrices, biases = classifier.sess.run([classifier.weight_matrices,
                                                classifier.biases])
 sparse_layers = []
 # turn dense pruned weights into sparse indices and values

@@ -95,7 +95,7 @@ class FullyConnectedClassifier(BaseNetwork):
     
             net = inputs
     
-            self.weight_matricies = []
+            self.weight_matrices = []
             self.biases = []
 
             weights_initializer = tf.truncated_normal_initializer(stddev=0.01)
@@ -111,7 +111,7 @@ class FullyConnectedClassifier(BaseNetwork):
                                               shape=shape,
                                               initializer=weights_initializer)
 
-                    self.weight_matricies.append(weights)
+                    self.weight_matrices.append(weights)
                     tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES,
                                          tf.reduce_sum(weights ** 2))
         

@@ -27,10 +27,10 @@ classifier = network_dense.FullyConnectedClassifier(
 
 # collect tf variables and correspoding optimizer variables
 with classifier.graph.as_default():
-    weight_matricies_tf = classifier.weight_matricies
-    optimizer_matricies_tf = [v 
+    weight_matrices_tf = classifier.weight_matrices
+    optimizer_matrices_tf = [v 
                               for v in tf.global_variables()
-                              for w in weight_matricies_tf
+                              for w in weight_matrices_tf
                               if w.name[:-2] in v.name
                               and 'optimizer' in v.name]
 
@@ -38,11 +38,11 @@ with classifier.graph.as_default():
 # and get values of weights and optimizer variables
 weights, optimizer_weights = (classifier
                              .load_model(config_dense.model_path)
-                             .sess.run([weight_matricies_tf,
-                                        optimizer_matricies_tf]))
+                             .sess.run([weight_matrices_tf,
+                                        optimizer_matrices_tf]))
 
 # plot weights distribution before pruning
-weights = classifier.sess.run(weight_matricies_tf)
+weights = classifier.sess.run(weight_matrices_tf)
 plot_utils.plot_histogram(weights,
                           'weights_distribution_before_pruning',
                           include_zeros=False)
@@ -58,8 +58,8 @@ for (weight_matrix,
      tf_optimizer_matrix) in zip(
      weights,
      optimizer_weights,
-     weight_matricies_tf,
-     optimizer_matricies_tf):
+     weight_matrices_tf,
+     optimizer_matrices_tf):
 
     mask = pruning_utils.mask_for_big_values(weight_matrix,
                                              config_pruned.pruning_threshold)
@@ -70,7 +70,7 @@ for (weight_matrix,
         classifier.sess.run(tf_optimizer_matrix.assign(optimizer_matrix * mask))
 
 # now, lets look on weights distribution (zero values are excluded)
-weights = classifier.sess.run(weight_matricies_tf)
+weights = classifier.sess.run(weight_matrices_tf)
 plot_utils.plot_histogram(weights,
                           'weights_distribution_after_pruning',
                           include_zeros=False)
@@ -89,7 +89,7 @@ classifier.fit(n_epochs=config_pruned.n_epochs,
                test_data_provider=test_data_provider)
 
 # plot weights distribution again to see the difference
-weights = classifier.sess.run(weight_matricies_tf)
+weights = classifier.sess.run(weight_matrices_tf)
 plot_utils.plot_histogram(weights,
                           'weights_distribution_after_fine_tuning',
                           include_zeros=False)
