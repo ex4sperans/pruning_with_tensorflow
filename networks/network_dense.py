@@ -18,7 +18,8 @@ class FullyConnectedClassifier(BaseNetwork):
                  momentum=0.9,
                  weight_decay=0.0005,
                  scope='FullyConnectedClassifier',
-                 verbose=True):
+                 verbose=True,
+                 pruning_threshold=None):
 
         self. input_size = input_size
         self.n_classes = n_classes
@@ -30,6 +31,7 @@ class FullyConnectedClassifier(BaseNetwork):
         self.weight_decay = weight_decay
         self.scope = scope
         self.verbose = verbose
+        self.pruning_threshold = pruning_threshold
 
         self.graph = tf.Graph()
         with self.graph.as_default():
@@ -48,7 +50,8 @@ class FullyConnectedClassifier(BaseNetwork):
 
                 self.train_op = self._create_optimizer(self.loss,
                                                        learning_rate=self.learning_rate,
-                                                       momentum=momentum)
+                                                       momentum=momentum,
+                                                       threshold=pruning_threshold)
 
                 self._create_metrics(logits=self.logits,
                                      labels=self.labels,
@@ -146,8 +149,14 @@ class FullyConnectedClassifier(BaseNetwork):
     def _create_optimizer(self,
                           loss: tf.Tensor,
                           learning_rate: Union[tf.Tensor, float],
-                          momentum: Union[tf.Tensor, float]) -> tf.Operation:
+                          momentum: Union[tf.Tensor, float],
+                          threshold: float) -> tf.Operation:
 
+        if threshold is not None:
+            return self._create_optimizer_sparse(loss=loss,
+                                                 threshold=threshold,
+                                                 learning_rate=learning_rate,
+                                                 momentum=momentum)
         with tf.variable_scope('optimizer'):
 
             optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,
@@ -157,6 +166,44 @@ class FullyConnectedClassifier(BaseNetwork):
             train_op = optimizer.minimize(loss,
                                           global_step=self.global_step,
                                           name='train_op')
+
+            return train_op
+
+    def _apply_prune_on_grads(self,
+                              grads_and_vars: list,
+                              threshold: float):
+
+        grads_and_vars_sparse = []
+
+        for grad, var in grads_and_vars:
+            if 'weights' in var.name:
+                small_weights = tf.greater(threshold, tf.abs(var))
+                mask = tf.cast(tf.logical_not(small_weights), tf.float32)
+                # var = var * mask
+                grad = grad * mask
+
+            grads_and_vars_sparse.append((grad, var))
+               
+        return grads_and_vars_sparse
+
+    def _create_optimizer_sparse(self,
+                                 loss: tf.Tensor,
+                                 threshold: float,
+                                 learning_rate: Union[tf.Tensor, float],
+                                 momentum: Union[tf.Tensor, float]) -> tf.Operation:
+
+        with tf.variable_scope('optimizer'):
+
+            optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,
+                                                   momentum=momentum,
+                                                   name='optimizer')
+            self.global_step = tf.Variable(0)
+            grads_and_vars = optimizer.compute_gradients(loss)
+            grads_and_vars_sparse = self._apply_prune_on_grads(grads_and_vars,
+                                                               threshold)
+            train_op = optimizer.apply_gradients(grads_and_vars_sparse,
+                                                 global_step=self.global_step,
+                                                 name='train_op')
 
             return train_op
 

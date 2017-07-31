@@ -3,3 +3,4 @@ env
 *.pyc
 MNIST_data
 saved_models
+*.png

@@ -26,12 +26,15 @@ class BaseNetwork:
         self.saver.save(sess or self.sess,
                         os.path.join(save_dir, 'model.ckpt'),
                         global_step=global_step)
+        return self
 
     def load_model(self, path=None, sess=None, verbose=True):
-        if path is None:
-            ckpt = tf.train.get_checkpoint_state(self.model_path)
-            if ckpt is None:
-                raise FileNotFoundError('Can`t load a model. '\
-                'Checkpoint does not exist.')    
-        restore_path = path or ckpt.model_checkpoint_path
+        path = path or self.model_path
+        ckpt = tf.train.get_checkpoint_state(path)
+        if ckpt is None:
+            raise FileNotFoundError('Can`t load a model. '\
+            'Checkpoint does not exist.')    
+        restore_path = ckpt.model_checkpoint_path
         self.saver.restore(sess or self.sess, restore_path)
+
+        return self
