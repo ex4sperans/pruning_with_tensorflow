@@ -17,7 +17,7 @@ def plot_histogram(weights_list, image_name, include_zeros=True):
             facecolor='green',
             edgecolor='black',
             alpha=0.7,
-            range=(-0.05, 0.05))
+            range=(-0.1, 0.1))
 
     ax.set_title('Weights distribution')
 

@@ -32,7 +32,7 @@ class ConfigNetworkDensePruned:
     weight_decay = 0.0001
     activation_fn = tf.nn.relu
     model_path = 'saved_models/network_dense_pruned'
-    pruning_threshold = 0.022
+    pruning_threshold = 0.03
 
     n_epochs = 20
     batch_size = 100
@@ -44,3 +44,12 @@ class ConfigNetworkDensePruned:
             return 1e-3
         else:
             return 1e-4
+
+class ConfigNetworkSparse:
+
+    input_size = 28 * 28
+    n_classes = 10
+    activation_fn = tf.nn.relu
+    model_path = 'saved_models/network_sparse'
+    
+    batch_size = 100

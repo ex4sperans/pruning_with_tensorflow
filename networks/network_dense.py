@@ -21,7 +21,7 @@ class FullyConnectedClassifier(BaseNetwork):
                  verbose=True,
                  pruning_threshold=None):
 
-        self. input_size = input_size
+        self.input_size = input_size
         self.n_classes = n_classes
         self.layer_sizes = layer_sizes + [n_classes]
         self.model_path = model_path
@@ -60,13 +60,11 @@ class FullyConnectedClassifier(BaseNetwork):
                 self.saver = self._create_saver(tf.global_variables())
                 self.init_variables(tf.global_variables())
 
-                tf.losses.get_regularization_losses()
-
                 if self.verbose:
                     print('\nSuccessfully created graph for {model}.'.format(
                                                                 model=self.scope))
-                    print('Number of parameters: {number}.\n'.format(
-                    number=int(self.number_of_parameters(tf.trainable_variables()))))
+                    print('Number of parameters (four bytes == 1 parameter): {}.\n'.format(
+                        int(self.number_of_parameters(tf.trainable_variables()))))
 
 
     def _create_placeholders(self):
@@ -98,6 +96,8 @@ class FullyConnectedClassifier(BaseNetwork):
             net = inputs
     
             self.weight_matricies = []
+            self.biases = []
+
             weights_initializer = tf.truncated_normal_initializer(stddev=0.01)
             bias_initializer = tf.constant_initializer(0.1)
 
@@ -120,6 +120,7 @@ class FullyConnectedClassifier(BaseNetwork):
                     bias = tf.get_variable(name=name,
                                            shape=shape,
                                            initializer=bias_initializer)
+                    self.biases.append(bias)
     
                     net = tf.matmul(net, weights) + bias
     

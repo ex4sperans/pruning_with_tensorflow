@@ -75,6 +75,11 @@ plot_utils.plot_histogram(weights,
                           'weights_distribution_after_pruning',
                           include_zeros=False)
 
+accuracy, loss = classifier.evaluate(data_provider=test_data_provider,
+                                     batch_size=config_pruned.batch_size)
+print('Accuracy on test before fine-tuning: {accuracy}, loss on test: {loss}'.format(
+                                                    accuracy=accuracy, loss=loss))
+
 # fine-tune classifier 
 classifier.fit(n_epochs=config_pruned.n_epochs,
                batch_size=config_pruned.batch_size,
