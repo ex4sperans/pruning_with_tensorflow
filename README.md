@@ -18,7 +18,7 @@ I was able to compress my model in almost 10 times.
 
 To recreate my results, please do the instructions listed below.
 
-At first, you need to install required python packages.
+**Package installation**
 
 I'd highly recommend to use [virtualenv](https://virtualenv.pypa.io/en/stable/) to isolate this project from other python projects.
 However you could install all the packages into a system if you want to.
@@ -29,6 +29,7 @@ To install the packages, run the following terminal command:
 
 ```pip install -r requirements.txt```
 
+**Experiments**
 
 Now you are ready to run the experiments.
 
@@ -61,6 +62,7 @@ Alternatively, you could run all at once:
 
 ```./run_experiments.sh```
 
+**Additional info**
 
 Configs for all models (dense, dense pruned, and sparse) could be found in ```configs.py```
 
