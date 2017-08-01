@@ -21,7 +21,7 @@ To recreate my results, please do the instructions listed below.
 **Package installation**
 
 I'd highly recommend to use [virtualenv](https://virtualenv.pypa.io/en/stable/) to isolate this project from other python projects.
-However you could install all the packages into a system if you want to.
+However you could install all the packages into the system if you want to.
 
 NOTE: I used ```python3.5``` for this project.
 
@@ -31,14 +31,11 @@ To install the packages, run the following terminal command:
 
 **Experiments**
 
-Now you are ready to run the experiments.
-
 Run 
 
 ```python train_network_dense.py```
 
 to train a regular dense model. MNIST dataset is downloaded automatically (it may take some time).
-
 
 Then, you need to prune a network and fine-tune it.
 
