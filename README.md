@@ -27,13 +27,17 @@ NOTE: I used ```python3.5``` for this project.
 
 To install the packages, run the following terminal command:
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 **Experiments**
 
 Run 
 
-```python train_network_dense.py```
+```
+python train_network_dense.py
+```
 
 to train a regular dense model. MNIST dataset is downloaded automatically (it may take some time).
 
@@ -45,7 +49,9 @@ Then, you need to prune a network and fine-tune it.
 
 Run 
 
-```python prune_network.py```
+```
+python prune_network.py
+```
 
 This script creates a new pruned model, fine-tunes it, and generates images with weights distribution (before pruning, after pruning and after fine-tuning).
 
@@ -61,7 +67,9 @@ Finally, it's a time to create a sparse network and deploy it.
 
 Run 
 
-```python deploy_pruned_model.py```
+```
+python deploy_pruned_model.py
+```
 
 to do it.
 
@@ -69,7 +77,9 @@ Last script deploys sparse model, measures accuracy and saves created sparse wei
 
 Alternatively, you could run all at once:
 
-```./run_experiments.sh```
+```
+./run_experiments.sh
+```
 
 **Additional info**
 
@@ -77,4 +87,6 @@ Configs for all models (dense, dense pruned, and sparse) could be found in ```co
 
 You could run tests with the following command:
 
-```./run_tests.sh```
+```
+./run_tests.sh
+```
