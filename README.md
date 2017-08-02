@@ -37,6 +37,10 @@ Run
 
 to train a regular dense model. MNIST dataset is downloaded automatically (it may take some time).
 
+Weights distribution after this phase might look something like this:
+
+<img src="https://github.com/ex4sperans/pruning_with_tensorflow/blob/master/pics/weights_distribution_before_pruning.png?raw=true" width="500"/>
+
 Then, you need to prune a network and fine-tune it.
 
 Run 
@@ -44,6 +48,14 @@ Run
 ```python prune_network.py```
 
 This script creates a new pruned model, fine-tunes it, and generates images with weights distribution (before pruning, after pruning and after fine-tuning).
+
+After removing the small weights, distribution is like this (zero weights are excluded):
+
+<img src="https://github.com/ex4sperans/pruning_with_tensorflow/blob/master/pics/weights_distribution_after_pruning.png?raw=true" width="500"/>
+
+After fine-tuning the distribution looks much more smoothed (as some of the weights have changed to compensate the pruned ones):
+
+<img src="https://github.com/ex4sperans/pruning_with_tensorflow/blob/master/pics/weights_distribution_after_fine_tuning.png?raw=true" width="500"/>
 
 Finally, it's a time to create a sparse network and deploy it.
 
@@ -66,3 +78,7 @@ Configs for all models (dense, dense pruned, and sparse) could be found in ```co
 You could run tests with the following command:
 
 ```./run_tests.sh```
+
+
+
+<img src="https://github.com/ex4sperans/SSD/blob/master/images/image1.jpg?raw=true" width="300"/> <img src="https://github.com/ex4sperans/SSD/blob/master/images/image2.jpg?raw=true" width="330"/> 
